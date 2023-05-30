@@ -2,7 +2,7 @@ package com.example.prm1.fragments
 
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
-import android.location.Location
+import android.location.Geocoder
 import android.location.LocationManager
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,13 +11,16 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import com.example.prm1.databinding.FragmentMapBinding
+import com.example.prm1.model.SettingsNote
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import java.util.*
 
 class MapFragment : Fragment() {
     private lateinit var binding: FragmentMapBinding
+    private lateinit var geoPoint: GeoPoint
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,6 +57,7 @@ class MapFragment : Fragment() {
             setTileSource(TileSourceFactory.MAPNIK)
         }
 
+
     }
 
     @SuppressLint("MissingPermission")
@@ -62,8 +66,20 @@ class MapFragment : Fragment() {
             overlays.add(MyLocationNewOverlay(this).apply { enableMyLocation() })
             requireContext().getSystemService(LocationManager::class.java).getLastKnownLocation(LocationManager.GPS_PROVIDER)
                 ?.let {
-                    controller.animateTo(GeoPoint(it.latitude, it.longitude), 18.0, 3000)
+                    geoPoint = GeoPoint(it.latitude, it.longitude)
+                    controller.animateTo(geoPoint, 21.0, 3000)
+                    val geocoder = Geocoder(context)
+                    val addresses = geocoder.getFromLocation(geoPoint.latitude, geoPoint.longitude, 1)
+                    binding.textView.text =
+                        ("ul. " + addresses?.get(0)?.thoroughfare + ", " + addresses?.get(0)?.locality + ", " + addresses?.get(0)?.countryName) ?: ""
+                    changeLocation()
                 }
+        }
+    }
+
+    private fun changeLocation(){
+        (parentFragmentManager.findFragmentByTag(EditFragment::class.java.name) as? EditFragment)?.let {
+            it.setLocation(binding.textView.text.toString())
         }
     }
 }

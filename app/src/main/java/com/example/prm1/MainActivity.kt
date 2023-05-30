@@ -11,7 +11,7 @@ import com.example.prm1.fragments.*
 class MainActivity : AppCompatActivity(), Navigable{
 
     private lateinit var listFragment: ListFragment
-    private lateinit var mapFragment: MapFragment
+   // private lateinit var mapFragment: MapFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity(), Navigable{
         }
 
         listFragment = ListFragment()
-        mapFragment = MapFragment()
+       // mapFragment = MapFragment()
         supportFragmentManager.beginTransaction()
             .add(R.id.container, listFragment, listFragment.javaClass.name)
             .commit()
@@ -54,9 +54,12 @@ class MainActivity : AppCompatActivity(), Navigable{
                 Navigable.Destination.AddPhoto -> {
                     replace(R.id.container, fragment!!, PhotoFragment::class.java.name)
                 }
+                /*
                 Navigable.Destination.Map -> {
                     replace(R.id.container, mapFragment, mapFragment::class.java.name)
                 }
+
+                 */
             }.commit()
         }
     }

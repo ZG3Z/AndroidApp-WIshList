@@ -11,6 +11,7 @@ import com.example.prm1.data.ProductDatabase
 import com.example.prm1.data.model.ProductEntity
 import com.example.prm1.databinding.FragmentEditBinding
 import com.example.prm1.model.Product
+import com.example.prm1.model.SettingsNote
 import java.io.IOException
 import kotlin.concurrent.thread
 
@@ -18,6 +19,8 @@ class EditFragment : Fragment() {
 
     private lateinit var binding: FragmentEditBinding
     private lateinit var product: Product
+    private var mapFragment = MapFragment()
+    private var isUserInMap: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,6 +64,18 @@ class EditFragment : Fragment() {
                 save()
                 true
             }
+            R.id.location -> {
+                parentFragmentManager.beginTransaction().apply {
+                    if(isUserInMap){
+                        hide(mapFragment)
+                    } else {
+                        show(mapFragment)
+                    }
+                    isUserInMap = !isUserInMap
+                    commit()
+                }
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -68,6 +83,11 @@ class EditFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        parentFragmentManager.beginTransaction().apply {
+            add(R.id.container, mapFragment, mapFragment::class.java.name)
+            hide(mapFragment)
+        }.commit()
 
         if(product!=null){
             binding.name.setText(product!!.name)
@@ -81,6 +101,10 @@ class EditFragment : Fragment() {
                 e.printStackTrace()
             }
         }
+    }
+
+    fun setLocation(location: String) {
+        binding.location.text = location
     }
 
     private fun save() {

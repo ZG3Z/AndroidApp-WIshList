@@ -26,10 +26,6 @@ class PhotoFragment : Fragment() {
     private val onTakePhoto: (Boolean) -> Unit = { photography: Boolean ->
         if(photography) {
             loadBitmap()
-            parentFragmentManager.beginTransaction().apply {
-                add(R.id.container, settingsPhotoFragment, settingsPhotoFragment::class.java.name)
-                hide(settingsPhotoFragment)
-            }.commit()
         } else {
             imageUri?.let {
                 requireContext().contentResolver.delete(it, null, null)
@@ -66,6 +62,11 @@ class PhotoFragment : Fragment() {
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        parentFragmentManager.beginTransaction().apply {
+            add(R.id.container, settingsPhotoFragment, settingsPhotoFragment::class.java.name)
+            hide(settingsPhotoFragment)
+        }.commit()
+
         createPicture()
     }
 

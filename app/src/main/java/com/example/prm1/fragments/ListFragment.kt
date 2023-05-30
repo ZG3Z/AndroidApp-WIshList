@@ -48,9 +48,12 @@ class ListFragment : Fragment(), ProductsAdapter.RemoveItemListener {
             (activity as? Navigable)?.navigate(Navigable.Destination.AddPhoto, PhotoFragment())
         }
 
+        /*
         binding.button.setOnClickListener {
             (activity as? Navigable)?.navigate(Navigable.Destination.Map, null)
         }
+
+         */
     }
 
     private fun loadData() =  thread {
