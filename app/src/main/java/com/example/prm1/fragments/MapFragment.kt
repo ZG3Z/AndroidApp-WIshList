@@ -13,14 +13,15 @@ import androidx.fragment.app.Fragment
 import com.example.prm1.databinding.FragmentMapBinding
 import com.example.prm1.model.SettingsNote
 import org.osmdroid.config.Configuration
+import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import java.util.*
 
-class MapFragment : Fragment() {
+class MapFragment : Fragment(), MapEventsReceiver {
     private lateinit var binding: FragmentMapBinding
-    private lateinit var geoPoint: GeoPoint
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -55,6 +56,7 @@ class MapFragment : Fragment() {
 
         binding.map.apply {
             setTileSource(TileSourceFactory.MAPNIK)
+            overlays.add(MapEventsOverlay(this@MapFragment))
         }
 
 
@@ -66,15 +68,29 @@ class MapFragment : Fragment() {
             overlays.add(MyLocationNewOverlay(this).apply { enableMyLocation() })
             requireContext().getSystemService(LocationManager::class.java).getLastKnownLocation(LocationManager.GPS_PROVIDER)
                 ?.let {
-                    geoPoint = GeoPoint(it.latitude, it.longitude)
+                    val geoPoint = GeoPoint(it.latitude, it.longitude)
                     controller.animateTo(geoPoint, 21.0, 3000)
-                    val geocoder = Geocoder(context)
-                    val addresses = geocoder.getFromLocation(geoPoint.latitude, geoPoint.longitude, 1)
-                    binding.textView.text =
-                        ("ul. " + addresses?.get(0)?.thoroughfare + ", " + addresses?.get(0)?.locality + ", " + addresses?.get(0)?.countryName) ?: ""
-                    changeLocation()
+                    setLocation(geoPoint)
                 }
         }
+    }
+
+    private fun setLocation(geoPoint: GeoPoint){
+        val geocoder = Geocoder(requireContext())
+        val addresses = geocoder.getFromLocation(geoPoint.latitude, geoPoint.longitude, 1)
+        binding.textView.text =
+            ("ul. " + addresses?.get(0)?.thoroughfare + ", " + addresses?.get(0)?.locality + ", " + addresses?.get(0)?.countryName) ?: ""
+        changeLocation()
+    }
+
+    override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean = false
+
+    override fun longPressHelper(p: GeoPoint?): Boolean {
+        p?.let {
+            setLocation(it)
+            return true
+        }
+        return false
     }
 
     private fun changeLocation(){
@@ -82,4 +98,5 @@ class MapFragment : Fragment() {
             it.setLocation(binding.textView.text.toString())
         }
     }
+
 }
