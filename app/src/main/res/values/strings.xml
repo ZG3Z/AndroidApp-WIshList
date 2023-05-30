@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">WishList</string>
+    <string name="buttonAdd">ADD PRODUCT</string>
+    <string name="buttonSave">SAVE</string>
+    <string name="buttonEdit">EDIT</string>
+    <string name="name">Name</string>
+    <string name="location">Location</string>
+</resources>
